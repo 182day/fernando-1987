@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Menu as Sidebar } from '../components/Menu';
+import { Footer } from '../components/Footer';
 import { Menu, X, LogOut, LayoutDashboard, LayoutPanelLeft } from 'lucide-react';
 import { useUserStore } from '../stores/useUserStore';
 import { ThemeToggle } from '../components/ThemeToggle';
@@ -100,6 +101,9 @@ export const Layout = () => {
                     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto w-full flex-1">
                         <Outlet />
                     </div>
+
+                    {/* Footer */}
+                    <Footer />
                 </main>
             </div>
         </div>

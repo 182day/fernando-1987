@@ -1,0 +1,290 @@
+/* Animación de Caracoles */
+.snail-race-track {
+    position: relative;
+    width: 100%;
+    height: 90px;
+    user-select: none;
+    overflow: hidden;
+}
+
+.track-line {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--app-border, #e5e7eb), transparent);
+    opacity: 0.6;
+}
+
+.track-dashed {
+    position: absolute;
+    bottom: 2px;
+    width: 100%;
+    height: 1px;
+    border-bottom: 1px dashed color-mix(in srgb, var(--app-border, #e5e7eb) 50%, transparent);
+}
+
+.finish-line {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 10;
+}
+
+.finish-flag {
+    width: 12px;
+    height: 32px;
+    background: repeating-linear-gradient(0deg, #000 0px, #000 4px, #fff 4px, #fff 8px);
+    border: 1px solid rgba(0,0,0,0.2);
+}
+
+.finish-text {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    color: var(--app-muted, #6b7280);
+    margin-top: 4px;
+}
+
+/* --- Contenedor que se mueve por la pista --- */
+.snail-track {
+    position: absolute;
+    left: -80px;
+    display: flex;
+    align-items: flex-end;
+    animation: snailRace linear infinite;
+    will-change: transform;
+    flex-direction: row-reverse;
+}
+
+.snail-track-1 {
+    bottom: 28px;
+    animation-duration: 12s;
+    animation-delay: 0s;
+}
+
+.snail-track-2 {
+    bottom: 6px;
+    animation-duration: 18s;
+    animation-delay: -4s;
+}
+
+.snail-track-3 {
+    bottom: 16px;
+    animation-duration: 15s;
+    animation-delay: -8s;
+}
+
+@keyframes snailRace {
+    0% { transform: translateX(0) }
+    100% { transform: translateX(calc(100vw + 100px)) }
+}
+
+@media (min-width: 1110px) {
+  @keyframes snailRace {
+    0% { transform: translateX(0) }
+    100% { transform: translateX(85vw) }
+  }
+}
+
+/* --- El caracol --- */
+.snail {
+    position: relative;
+    width: 52px;
+    height: 36px;
+    animation: snailBob 0.6s ease-in-out infinite alternate;
+}
+
+.snail-2 {
+    transform: scale(0.85);
+    filter: hue-rotate(25deg);
+}
+
+.snail-3 {
+    transform: scale(0.92);
+    filter: hue-rotate(-15deg);
+}
+
+@keyframes snailBob {
+    0% { transform: translateY(0px) }
+    100% { transform: translateY(-1.5px) }
+}
+
+.snail-body {
+    position: absolute;
+    bottom: 4px;
+    right: 0;
+    left: auto;
+    width: 38px;
+    height: 16px;
+    background: linear-gradient(180deg, #ffe5bd 0%, #f3c88d 100%);
+    border-radius: 18px 20px 14px 8px;
+    z-index: 2;
+    box-shadow: inset 2px -2px 0 rgba(0,0,0,0.08);
+}
+
+.snail-head {
+    position: absolute;
+    right: -4px;
+    left: auto;
+    top: 2px;
+    width: 16px;
+    height: 12px;
+    background: inherit;
+    border-radius: 8px 12px 12px 8px;
+}
+
+.snail-eye-stalk {
+    position: absolute;
+    bottom: 12px;
+    width: 3px;
+    height: 14px;
+    background: #f3c88d;
+    border-radius: 3px;
+    transform-origin: bottom center;
+}
+
+.snail-eye-stalk.left { right: -2px; left: auto; animation: eyeWiggle 1.2s ease-in-out infinite; }
+.snail-eye-stalk.right { right: 4px; left: auto; animation: eyeWiggle 1.2s ease-in-out infinite 0.3s; }
+
+@keyframes eyeWiggle {
+    0%, 100% { transform: rotate(8deg) }
+    50% { transform: rotate(-8deg) }
+}
+
+.eye {
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    border: 1px solid #e8b26a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pupil {
+    width: 3px;
+    height: 3px;
+    background: #222;
+    border-radius: 50%;
+    animation: pupilMove 3s ease-in-out infinite;
+}
+
+@keyframes pupilMove {
+    0%, 90%, 100% { transform: translate(0,0) }
+    92% { transform: translate(1px, 1px) }
+    94% { transform: translate(-1px, 0) }
+}
+
+.snail-shell {
+    position: absolute;
+    bottom: 10px;
+    right: 18px;
+    left: auto;
+    width: 28px;
+    height: 28px;
+    background: radial-gradient(circle at 30% 30%, #ff9a5c, #d3542a 70%);
+    border-radius: 50%;
+    z-index: 3;
+    box-shadow: inset 3px -3px 6px rgba(0,0,0,0.2), -1px 1px 0 rgba(0,0,0,0.1);
+    animation: shellRotate 0.6s ease-in-out infinite alternate;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.snail-2 .snail-shell { background: radial-gradient(circle at 30% 30%, #6ec6ff, #2a6cb6 70%); }
+.snail-3 .snail-shell { background: radial-gradient(circle at 30% 30%, #a0e75a, #3a8a2e 70%); }
+
+@keyframes shellRotate {
+    from { transform: rotate(3deg) }
+    to { transform: rotate(-3deg) }
+}
+
+.shell-spiral {
+    position: absolute;
+    inset: 4px;
+    border: 2.5px solid rgba(255,255,255,0.9);
+    border-color: rgba(255,255,255,0.9) transparent transparent rgba(0,0,0,0.15);
+    border-radius: 50%;
+    transform: rotate(-20deg);
+}
+
+.shell-spiral::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 2px solid rgba(255,255,255,0.6);
+    border-color: transparent rgba(255,255,255,0.6) rgba(0,0,0,0.1) transparent;
+    border-radius: 50%;
+}
+
+.snail-foot {
+    position: absolute;
+    bottom: 0px;
+    right: -2px;
+    left: auto;
+    width: 44px;
+    height: 6px;
+    background: #eab67c;
+    border-radius: 10px 0 10px 10px;
+    animation: footWave 0.35s ease-in-out infinite;
+    z-index: 1;
+}
+
+@keyframes footWave {
+    0% { transform: scaleX(1) }
+    50% { transform: scaleX(1.05) scaleY(0.9) }
+    100% { transform: scaleX(1) }
+}
+
+/* Baba del caracol) */
+.slime {
+    position: absolute;
+    bottom: 1px;
+    left: -120px;
+    right: 2px;
+    height: 2px;
+    background: linear-gradient(270deg, rgba(160,220,180,0.5) 0%, rgba(160,220,180,0.15) 60%, transparent 100%);
+    border-radius: 2px;
+    opacity: 0.8;
+}
+
+/* Polvo */
+.dust {
+    position: absolute;
+    bottom: 0;
+    width: 2px;
+    height: 2px;
+    background: #c9a87a;
+    border-radius: 50%;
+    opacity: 0;
+    animation: dustPuff 1s ease-out infinite;
+}
+.dust-1 { left: 10%; animation-delay: 0.2s }
+.dust-2 { left: 20%; animation-delay: 0.6s }
+.dust-3 { left: 15%; animation-delay: 1s }
+
+@keyframes dustPuff {
+    0% { transform: translateY(0) scale(1); opacity: 0.6 }
+    100% { transform: translateY(-10px) scale(0); opacity: 0 }
+}
+
+/* Hover divertido */
+.snail-track:hover {
+    animation-play-state: paused;
+}
+.snail-track:hover .pupil {
+    transform: scale(1.5);
+}

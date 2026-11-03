@@ -12,7 +12,7 @@ export const Dashboard: React.FC = () => {
 
     return (
         <>
-            <div className="min-h-screen bg-app-bg text-app-text p-6 transition-colors duration-200">
+            <div className="space-y-3">
                 {/* Cabecera del Dashboard */}
                 <div className="flex justify-between items-center bg-app-card border border-app-border p-6 shadow-sm rounded-xl mb-6">
                     <div>
