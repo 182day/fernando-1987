@@ -1,5 +1,6 @@
 // src/Router.tsx
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 // Vistas de la aplicación
 import { Login } from './pages/Login';
@@ -14,7 +15,15 @@ export function Router() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        <Route path="/dashboard" element={<Dashboard />} />
+        {/* Rutas Protegidas (Requieren sesión activa en Zustand) */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
