@@ -1,1 +1,46 @@
 @import "tailwindcss";
+
+/* ==========================================================================
+   PALETA BÁSICA
+   ========================================================================== */
+
+:root {
+  --color-app-bg: #f8fafc;
+  --color-app-card: #ffffff;
+  --color-app-border: #e2e8f0;
+  --color-app-text: #0f172a;
+  --color-app-muted: #64748b;
+  --color-app-button: #f1f5f9;
+  --color-app-button-hover: #e2e8f0;
+  --color-app-primary: #3b82f6;
+}
+
+
+/* ==========================================================================
+   REGISTRO DE TEMA EN TAILWIND CSS v4
+   ========================================================================== */
+
+@theme {
+  --color-app-bg: var(--color-app-bg);
+  --color-app-card: var(--color-app-card);
+  --color-app-border: var(--color-app-border);
+  --color-app-text: var(--color-app-text);
+  --color-app-muted: var(--color-app-muted);
+  --color-app-button: var(--color-app-button);
+  --color-app-button-hover: var(--color-app-button-hover);
+  --color-app-primary: var(--color-app-primary);
+}
+
+
+/* ==========================================================================
+   ESTILOS BASE
+   ========================================================================== */
+
+body {
+  background-color: var(--color-app-bg);
+  color: var(--color-app-text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
