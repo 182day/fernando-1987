@@ -30,6 +30,7 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
   const [responseMessage, setResponseMessage] = useState<{
     type: 'success' | 'error';
     text: string;
+    details?: any
   } | null>(null);
 
   if (!isOpen) return null;
@@ -114,15 +115,25 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
         cvv: cvv.trim(),
         cardHolderName: cardHolderName.trim(),
         amount: Number(amount),
+        payerEmail: 'fers.delagarza@gmail.com'
       });
 
       const data = response.data;
 
       // Capturamos el campo 'mensaje' que viene del controlador
-      setResponseMessage({
-        type: 'success',
-        text: data.mensaje || 'Pago procesado exitosamente',
-      });
+      if (data.status === 'approved') {
+        setResponseMessage({
+          type: 'success',
+          text: `¡Recarga exitosa! Se han acreditado $${data.transaction_amount} a tu saldo.`,
+          details: data,
+        });
+      } else {
+        setResponseMessage({
+          type: 'error',
+          text: data.status_detail || 'La transacción fue rechazada.',
+          details: data,
+        });
+      }
     } catch (error: any) {
       const errorData = error.response?.data;
 
@@ -176,9 +187,9 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
 
         {/* Alerta de respuesta basada en el controlador */}
         {responseMessage && (
-          <div className={`mb-4 p-4 rounded-xl flex items-start gap-3 text-sm ${responseMessage.type === 'success'
-              ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400'
-              : 'bg-red-500/10 border border-red-500/20 text-red-700 dark:text-red-400'
+          <div className={`mb-4 p-4 rounded-lg flex items-start gap-3 text-sm ${responseMessage.type === 'success'
+              ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
+              : 'bg-red-50 border border-red-200 text-red-700'
             }`}>
             {responseMessage.type === 'success' ? (
               <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5 text-emerald-600" />
@@ -187,6 +198,16 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
             )}
             <div>
               <p className="font-semibold">{responseMessage.text}</p>
+              {responseMessage.details && (
+                <div className="mt-2 text-xs opacity-90 space-y-1">
+                  <p><strong>ID Operación:</strong> {responseMessage.details.id}</p>
+                  <p><strong>Estado:</strong> {responseMessage.details.status}</p>
+                  {responseMessage.details.authorization_code && (
+                    <p><strong>Código Auth:</strong> {responseMessage.details.authorization_code}</p>
+                  )}
+                  <p><strong>Referencia:</strong> {responseMessage.details.reference}</p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -203,8 +224,8 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
               onChange={handleChange}
               placeholder="1234123412341234"
               className={`w-full bg-app-bg border rounded-xl py-2 px-3 text-sm focus:outline-none transition-colors ${error.cardNumber
-                  ? 'border-red-500 bg-red-500/5 focus:border-red-500'
-                  : 'border-app-border focus:border-amber-500'
+                ? 'border-red-500 bg-red-500/5 focus:border-red-500'
+                : 'border-app-border focus:border-amber-500'
                 }`}
             />
             <p className="text-[10px] text-app-muted mt-1">
@@ -223,8 +244,8 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
                 value={form.expirationDate}
                 onChange={handleChange}
                 className={`w-full bg-app-bg border rounded-xl py-2 px-3 text-sm focus:outline-none transition-colors ${error.expirationDate
-                    ? 'border-red-500 bg-red-500/5 focus:border-red-500'
-                    : 'border-app-border focus:border-amber-500'
+                  ? 'border-red-500 bg-red-500/5 focus:border-red-500'
+                  : 'border-app-border focus:border-amber-500'
                   }`}
               />
             </div>
@@ -239,8 +260,8 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
                 value={form.cvv}
                 onChange={handleChange}
                 className={`w-full bg-app-bg border rounded-xl py-2 px-3 text-sm focus:outline-none transition-colors ${error.cvv
-                    ? 'border-red-500 bg-red-500/5 focus:border-red-500'
-                    : 'border-app-border focus:border-amber-500'
+                  ? 'border-red-500 bg-red-500/5 focus:border-red-500'
+                  : 'border-app-border focus:border-amber-500'
                   }`}
               />
             </div>
@@ -256,8 +277,8 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
               onChange={handleChange}
               placeholder="Fernando Contreras"
               className={`w-full bg-app-bg border rounded-xl py-2 px-3 text-sm focus:outline-none transition-colors ${error.cardHolderName
-                  ? 'border-red-500 bg-red-500/5 focus:border-red-500'
-                  : 'border-app-border focus:border-amber-500'
+                ? 'border-red-500 bg-red-500/5 focus:border-red-500'
+                : 'border-app-border focus:border-amber-500'
                 }`}
             />
           </div>
@@ -276,8 +297,8 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
                 onChange={handleChange}
                 placeholder="500"
                 className={`w-full bg-app-bg border rounded-xl py-2 pl-9 pr-3 text-sm focus:outline-none transition-colors ${error.amount
-                    ? 'border-red-500 bg-red-500/5 focus:border-red-500'
-                    : 'border-app-border focus:border-amber-500'
+                  ? 'border-red-500 bg-red-500/5 focus:border-red-500'
+                  : 'border-app-border focus:border-amber-500'
                   }`}
               />
             </div>
