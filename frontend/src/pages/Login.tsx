@@ -1,20 +1,23 @@
 // src/pages/Login.tsx
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Mail, Lock, LogIn, ShieldAlert, Loader2 } from 'lucide-react';
-import { EMAIL_REGEX, PASSWORD_REGEX } from '../utils/formUtils'
-
-interface FormValues {
-  email: string;
-  password: string;
-}
+import { EMAIL_REGEX } from '../utils/formUtils';
+import { type LoginData } from '../interfaces/user';
 
 export const Login: React.FC = () => {
-  const [formData, setFormData] = useState<FormValues>({
+  const [formData, setFormData] = useState<LoginData>({
     email: '',
     password: '',
   });
+  
+  // Estado para registrar qué campos tienen error individualmente (marcar en rojo)
+  const [error, setError] = useState<Record<string, boolean>>({});
+  
+  // Mensaje de alerta general dinámico
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -22,38 +25,55 @@ export const Login: React.FC = () => {
       ...prev,
       [name]: value,
     }));
+    
+    // Limpiamos el error del input específico y la alerta al empezar a escribir
+    if (error[name]) {
+      setError((prev) => ({ ...prev, [name]: false }));
+      setErrorMessage(null);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Desestructuramos el estado actual
     const { email, password } = formData;
 
-    // 1. Validar correo electrónico con .trim() y la expresión regular
-    if (!email.trim() || !EMAIL_REGEX.test(email.trim())) {
-      setError('Por favor, ingresa un correo electrónico válido.');
+    const newErrors: Record<string, boolean> = {};
+    let firstErrorMsg = '';
+
+    // 1. Validar correo electrónico (vacío o formato incorrecto)
+    if (!email.trim()) {
+      newErrors.email = true;
+      firstErrorMsg = 'Por favor, ingresa un correo electrónico.';
+    } else if (!EMAIL_REGEX.test(email.trim())) {
+      newErrors.email = true;
+      firstErrorMsg = 'Por favor, ingresa un correo electrónico válido.';
+    }
+
+    // 2. Validar contraseña (vacía o no cumple el formato)
+    if (!password) {
+      newErrors.password = true;
+      if (!firstErrorMsg) firstErrorMsg = 'Por favor, ingresa tu contraseña.';
+    }
+
+    // Si hay algún error, actualizamos los estados y detenemos el envío
+    if (Object.keys(newErrors).length > 0) {
+      setError(newErrors);
+      setErrorMessage(firstErrorMsg);
       return;
     }
 
-    // 2. Validar contraseña
-    if (!PASSWORD_REGEX.test(password)) {
-      setError('La contraseña debe tener al menos 6 caracteres, una mayúscula y un carácter especial.');
-      return;
-    }
-
-    setError(null);
+    setError({});
+    setErrorMessage(null);
     setLoading(true);
 
-
     try {
-      // Limpiamos espacios del email al enviar si es necesario
       console.log('Iniciando sesión con:', { email: email.trim().toLowerCase(), password });
 
       // Simulación de petición de red
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
     } catch (err) {
-      setError('Credenciales incorrectas o error en el servidor.');
+      setErrorMessage('Credenciales incorrectas o error en el servidor.');
     } finally {
       setLoading(false);
     }
@@ -70,16 +90,18 @@ export const Login: React.FC = () => {
           <p className="text-sm text-gray-500 mt-1">Inicia sesión en tu cuenta</p>
         </div>
 
-        {error && (
+        {errorMessage && (
           <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-600 text-sm">
             <ShieldAlert className="w-5 h-5 shrink-0" />
-            <span>{error}</span>
+            <span>{errorMessage}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Correo Electrónico <span className="text-red-500">*</span>
+            </label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -89,24 +111,33 @@ export const Login: React.FC = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="fernando@example.com"
-                className="w-full border border-gray-300 rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none focus:border-blue-500"
+                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${
+                  error.email 
+                    ? 'border-red-500 bg-red-500/5 focus:border-red-500' 
+                    : 'border-gray-300 focus:border-blue-500'
+                }`}
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Contraseña <span className="text-red-500">*</span>
+            </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="password"
                 name="password"
-                required
                 disabled={loading}
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className="w-full border border-gray-300 rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none focus:border-blue-500"
+                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${
+                  error.password 
+                    ? 'border-red-500 bg-red-500/5 focus:border-red-500' 
+                    : 'border-gray-300 focus:border-blue-500'
+                }`}
               />
             </div>
           </div>
@@ -126,6 +157,13 @@ export const Login: React.FC = () => {
             )}
           </button>
         </form>
+
+        <p className="text-center text-sm text-gray-600 mt-6">
+          ¿No tienes una cuenta?{' '}
+          <Link to="/register" className="text-blue-600 font-medium hover:underline">
+            Regístrate aquí
+          </Link>
+        </p>
       </div>
     </div>
   );
