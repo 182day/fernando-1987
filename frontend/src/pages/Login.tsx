@@ -1,12 +1,20 @@
 // src/pages/Login.tsx
 import React, { useState } from 'react';
-import { Mail, Lock, LogIn } from 'lucide-react';
+import { Mail, Lock, LogIn, ShieldAlert, Loader2 } from 'lucide-react';
+import { EMAIL_REGEX, PASSWORD_REGEX } from '../utils/formUtils'
+
+interface FormValues {
+  email: string;
+  password: string;
+}
 
 export const Login: React.FC = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormValues>({
     email: '',
     password: '',
   });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -16,9 +24,39 @@ export const Login: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login...', formData);
+    // Desestructuramos el estado actual
+    const { email, password } = formData;
+
+    // 1. Validar correo electrónico con .trim() y la expresión regular
+    if (!email.trim() || !EMAIL_REGEX.test(email.trim())) {
+      setError('Por favor, ingresa un correo electrónico válido.');
+      return;
+    }
+
+    // 2. Validar contraseña
+    if (!PASSWORD_REGEX.test(password)) {
+      setError('La contraseña debe tener al menos 6 caracteres, una mayúscula y un carácter especial.');
+      return;
+    }
+
+    setError(null);
+    setLoading(true);
+
+
+    try {
+      // Limpiamos espacios del email al enviar si es necesario
+      console.log('Iniciando sesión con:', { email: email.trim().toLowerCase(), password });
+
+      // Simulación de petición de red
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    } catch (err) {
+      setError('Credenciales incorrectas o error en el servidor.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,7 +70,14 @@ export const Login: React.FC = () => {
           <p className="text-sm text-gray-500 mt-1">Inicia sesión en tu cuenta</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {error && (
+          <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-600 text-sm">
+            <ShieldAlert className="w-5 h-5 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
             <div className="relative">
@@ -40,7 +85,7 @@ export const Login: React.FC = () => {
               <input
                 type="email"
                 name="email"
-                required
+                disabled={loading}
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="fernando@example.com"
@@ -57,6 +102,7 @@ export const Login: React.FC = () => {
                 type="password"
                 name="password"
                 required
+                disabled={loading}
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
@@ -67,9 +113,17 @@ export const Login: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition shadow-md cursor-pointer mt-2"
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition shadow-md cursor-pointer mt-2 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Ingresar
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                Ingresando...
+              </>
+            ) : (
+              'Ingresar'
+            )}
           </button>
         </form>
       </div>

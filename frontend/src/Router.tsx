@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Vistas de la aplicación
 import { Login } from './pages/Login';
+import { Register } from './pages/Register';
 
 export function Router() {
   return (
@@ -10,6 +11,7 @@ export function Router() {
       <Routes>
         {/* Rutas Públicas */}
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
