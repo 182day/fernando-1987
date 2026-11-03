@@ -4,7 +4,7 @@ export interface SnailPayData {
   expirationDate: string;
   cvv: string;
   cardHolderName: string;
-  amount: number | string;
-  payerId?: string;
-  payerEmail?: string;
+  amount: number;
+  payerId: string;
+  payerEmail: string;
 }

@@ -2,11 +2,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { type UserData, type LoginData } from '../interfaces/user';
-import { STORAGE_KEY } from '../utils/formUtils';
+import { STORAGE_KEY, generateMongoId } from '../utils/formUtils';
 
 // Interfaz interna para los usuarios guardados (omitiendo confirmPassword y añadiendo balance)
 export interface StoredUser extends Omit<UserData, 'confirmPassword'> {
-  balance?: number;
+    id: string;
+    balance?: number;
 }
 
 interface UserState {
@@ -38,6 +39,7 @@ export const useUserStore = create<UserState>()(
 
                 // Creamos el nuevo usuario omitiendo confirmPassword
                 const newUser: StoredUser = {
+                    id: generateMongoId(),
                     name: userData.name.trim(),
                     email: cleanEmail,
                     password: userData.password,

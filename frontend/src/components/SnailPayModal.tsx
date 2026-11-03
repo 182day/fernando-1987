@@ -4,6 +4,7 @@ import api from '../api/axios';
 import { type SnailPayData } from '../interfaces/snailPay';
 import { CARD_NUMBER_REGEX, EXPIRATION_DATE_REGEX, CVV_REGEX, AMOUNT_REGEX } from '../utils/formUtils';
 import { CreditCard, DollarSign, ShieldAlert, CheckCircle2, Loader2, X } from 'lucide-react';
+import { useUserStore } from '../stores/useUserStore';
 
 interface SnailPayModalProps {
   isOpen: boolean;
@@ -11,12 +12,14 @@ interface SnailPayModalProps {
 }
 
 export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose }) => {
+  const { user } = useUserStore();
+  
   // Estado unificado del formulario
   const [form, setForm] = useState<SnailPayData>({
     cardNumber: '',
     expirationDate: '',
     cvv: '',
-    cardHolderName: '',
+    cardHolderName: user?.name || '',
     amount: '',
   });
 
@@ -115,7 +118,8 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
         cvv: cvv.trim(),
         cardHolderName: cardHolderName.trim(),
         amount: Number(amount),
-        payerEmail: 'fers.delagarza@gmail.com'
+        payerId: user?.id || '',
+        payerEmail: user?.email || '',
       });
 
       const data = response.data;

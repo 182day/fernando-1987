@@ -33,3 +33,10 @@ const formateadorMXN = new Intl.NumberFormat('es-MX', {
 export const formatearPesos = (cantidad: number): string => {
   return formateadorMXN.format(cantidad);
 };
+
+// --- GENERAR ID RANDOM TIPO MONGODB ---
+export const generateMongoId = (): string => {
+  return Array.from({ length: 24 }, () => 
+    Math.floor(Math.random() * 16).toString(16)
+  ).join('');
+};

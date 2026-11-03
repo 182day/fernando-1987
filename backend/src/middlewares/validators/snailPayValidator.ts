@@ -46,6 +46,13 @@ export const validateSnailPayPayment = [
         .withMessage('El correo del pagador es obligatorio.')
         .isEmail()
         .withMessage('Debe proporcionar un correo electrónico válido.'),
+    
+    // Validación del ID del pagador
+    body('payerId')
+        .notEmpty()
+        .withMessage('El ID del pagador es obligatorio.')
+        .isString()
+        .withMessage('El ID del pagador debe ser un texto válido.'),
 
     // Middleware para verificar si hubo errores de validación
     (req: Request, res: Response, next: NextFunction): void => {
