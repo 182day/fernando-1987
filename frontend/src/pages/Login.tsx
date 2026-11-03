@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import { EMAIL_REGEX } from '../utils/formUtils';
 import { type LoginData } from '../interfaces/user';
 import { useUserStore } from '../stores/useUserStore';
+import { ThemeToggle } from '../components/ThemeToggle';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -108,6 +109,8 @@ export const Login: React.FC = () => {
       cancelButtonColor: '#ef4444',
       confirmButtonText: 'Sí, limpiar',
       cancelButtonText: 'Cancelar',
+      background: 'var(--color-app-card)',
+      color: 'var(--color-app-text)',
     });
 
     if (result.isConfirmed) {
@@ -117,24 +120,29 @@ export const Login: React.FC = () => {
         text: 'Los datos locales han sido borrados con éxito.',
         icon: 'success',
         confirmButtonColor: '#2563eb',
+        background: 'var(--color-app-card)',
+        color: 'var(--color-app-text)',
       });
       window.location.reload();
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white border border-gray-200 rounded-xl shadow-lg p-8">
+    <div className="min-h-screen bg-app-bg text-app-text flex items-center justify-center p-4 relative transition-colors duration-200">
+      
+      <ThemeToggle className="absolute top-6 right-6" />
+
+      <div className="w-full max-w-md bg-app-card border border-app-border rounded-xl shadow-lg p-8">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-600 rounded-full mb-3">
+          <div className="inline-flex items-center justify-center w-12 h-12 bg-app-primary/10 text-app-primary rounded-full mb-3">
             <LogIn className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">Sistema de Caracoles</h1>
-          <p className="text-sm text-gray-500 mt-1">Inicia sesión en tu cuenta</p>
+          <h1 className="text-2xl font-bold font-display">Sistema de Caracoles</h1>
+          <p className="text-sm text-app-muted mt-1">Inicia sesión en tu cuenta</p>
         </div>
 
         {errorMessage && (
-          <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-600 text-sm">
+          <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-2 text-red-500 text-sm">
             <ShieldAlert className="w-5 h-5 shrink-0" />
             <span>{errorMessage}</span>
           </div>
@@ -142,11 +150,11 @@ export const Login: React.FC = () => {
 
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-app-text mb-1">
               Correo Electrónico <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
               <input
                 type="email"
                 name="email"
@@ -154,20 +162,21 @@ export const Login: React.FC = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="fernando@example.com"
-                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${error.email
+                className={`w-full bg-transparent border rounded-lg py-2 pl-10 pr-4 text-app-text placeholder:text-app-muted focus:outline-none transition-colors ${
+                  error.email
                     ? 'border-red-500 bg-red-500/5 focus:border-red-500'
-                    : 'border-gray-300 focus:border-blue-500'
-                  }`}
+                    : 'border-app-border focus:border-app-primary'
+                }`}
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-app-text mb-1">
               Contraseña <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
               <input
                 type="password"
                 name="password"
@@ -175,10 +184,11 @@ export const Login: React.FC = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${error.password
+                className={`w-full bg-transparent border rounded-lg py-2 pl-10 pr-4 text-app-text placeholder:text-app-muted focus:outline-none transition-colors ${
+                  error.password
                     ? 'border-red-500 bg-red-500/5 focus:border-red-500'
-                    : 'border-gray-300 focus:border-blue-500'
-                  }`}
+                    : 'border-app-border focus:border-app-primary'
+                }`}
               />
             </div>
           </div>
@@ -186,7 +196,7 @@ export const Login: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition shadow-md cursor-pointer mt-2 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-app-primary hover:opacity-90 text-white font-medium py-2.5 rounded-lg transition shadow-md cursor-pointer mt-2 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
@@ -199,19 +209,19 @@ export const Login: React.FC = () => {
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-600 mt-6">
+        <p className="text-center text-sm text-app-muted mt-6">
           ¿No tienes una cuenta?{' '}
-          <Link to="/register" className="text-blue-600 font-medium hover:underline">
+          <Link to="/register" className="text-app-primary font-medium hover:underline">
             Regístrate aquí
           </Link>
         </p>
 
         {/* Botón para limpiar el storage */}
-        <div className="mt-6 pt-4 border-t border-gray-100 text-center">
+        <div className="mt-6 pt-4 border-t border-app-border text-center">
           <button
             type="button"
             onClick={handleClearStorage}
-            className="text-xs text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+            className="text-xs text-app-muted hover:text-red-500 transition-colors cursor-pointer"
           >
             Limpiar datos almacenados
           </button>

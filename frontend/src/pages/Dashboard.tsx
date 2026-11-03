@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { formatearPesos } from '../utils/formUtils';
 import { ChartsSection } from '../components/ChartsSection';
 import { SnailPayModal } from '../components/SnailPayModal';
+import { ThemeToggle } from '../components/ThemeToggle';
 
 export const Dashboard: React.FC = () => {
     const { user, balance, logout } = useUserStore();
@@ -28,6 +29,8 @@ export const Dashboard: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-4">
+                        <ThemeToggle />
+
                         <button
                             onClick={() => setIsSnailPayOpen(true)}
                             className="bg-amber-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-amber-600 transition shadow-sm cursor-pointer"

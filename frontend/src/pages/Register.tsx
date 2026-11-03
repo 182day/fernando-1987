@@ -5,6 +5,7 @@ import { User, Mail, Lock, UserPlus, ShieldAlert, Loader2 } from 'lucide-react';
 import { EMAIL_REGEX, PASSWORD_REGEX } from '../utils/formUtils';
 import { type UserData } from '../interfaces/user';
 import { useUserStore } from '../stores/useUserStore';
+import { ThemeToggle } from '../components/ThemeToggle';
 
 export const Register: React.FC = () => {
     const navigate = useNavigate();
@@ -115,18 +116,21 @@ export const Register: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-            <div className="w-full max-w-md bg-white border border-gray-200 rounded-xl shadow-lg p-8">
+        <div className="min-h-screen bg-app-bg text-app-text flex items-center justify-center p-4 relative transition-colors duration-200">
+            
+            <ThemeToggle className="absolute top-6 right-6" />
+
+            <div className="w-full max-w-md bg-app-card border border-app-border rounded-xl shadow-lg p-8">
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-100 text-amber-600 rounded-full mb-3">
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-amber-500/10 text-amber-500 rounded-full mb-3">
                         <UserPlus className="w-6 h-6" />
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-800">Registro - Sistema de Caracoles</h1>
-                    <p className="text-sm text-gray-500 mt-1">Crea tu cuenta para comenzar</p>
+                    <h1 className="text-2xl font-bold font-display">Registro - Sistema de Caracoles</h1>
+                    <p className="text-sm text-app-muted mt-1">Crea tu cuenta para comenzar</p>
                 </div>
 
                 {errorMessage && (
-                    <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-600 text-sm">
+                    <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-2 text-red-500 text-sm">
                         <ShieldAlert className="w-5 h-5 shrink-0" />
                         <span>{errorMessage}</span>
                     </div>
@@ -134,11 +138,11 @@ export const Register: React.FC = () => {
 
                 <form onSubmit={handleSubmit} noValidate className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-app-text mb-1">
                             Nombre Completo <span className="text-red-500">*</span>
                         </label>
                         <div className="relative">
-                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                             <input
                                 type="text"
                                 name="name"
@@ -146,20 +150,21 @@ export const Register: React.FC = () => {
                                 value={formData.name}
                                 onChange={handleChange}
                                 placeholder="Fernando Contreras"
-                                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${error.name
+                                className={`w-full bg-transparent border rounded-lg py-2 pl-10 pr-4 text-app-text placeholder:text-app-muted focus:outline-none transition-colors ${
+                                    error.name
                                         ? 'border-red-500 bg-red-500/5 focus:border-red-500'
-                                        : 'border-gray-300 focus:border-amber-500'
-                                    }`}
+                                        : 'border-app-border focus:border-amber-500'
+                                }`}
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-app-text mb-1">
                             Correo Electrónico <span className="text-red-500">*</span>
                         </label>
                         <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                             <input
                                 type="email"
                                 name="email"
@@ -167,20 +172,21 @@ export const Register: React.FC = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 placeholder="fernando@example.com"
-                                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${error.email
+                                className={`w-full bg-transparent border rounded-lg py-2 pl-10 pr-4 text-app-text placeholder:text-app-muted focus:outline-none transition-colors ${
+                                    error.email
                                         ? 'border-red-500 bg-red-500/5 focus:border-red-500'
-                                        : 'border-gray-300 focus:border-amber-500'
-                                    }`}
+                                        : 'border-app-border focus:border-amber-500'
+                                }`}
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-app-text mb-1">
                             Contraseña <span className="text-red-500">*</span>
                         </label>
                         <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                             <input
                                 type="password"
                                 name="password"
@@ -188,20 +194,21 @@ export const Register: React.FC = () => {
                                 value={formData.password}
                                 onChange={handleChange}
                                 placeholder="••••••••"
-                                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${error.password
+                                className={`w-full bg-transparent border rounded-lg py-2 pl-10 pr-4 text-app-text placeholder:text-app-muted focus:outline-none transition-colors ${
+                                    error.password
                                         ? 'border-red-500 bg-red-500/5 focus:border-red-500'
-                                        : 'border-gray-300 focus:border-amber-500'
-                                    }`}
+                                        : 'border-app-border focus:border-amber-500'
+                                }`}
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-app-text mb-1">
                             Confirmar Contraseña <span className="text-red-500">*</span>
                         </label>
                         <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-app-muted" />
                             <input
                                 type="password"
                                 name="confirmPassword"
@@ -209,10 +216,11 @@ export const Register: React.FC = () => {
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
                                 placeholder="••••••••"
-                                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${error.confirmPassword
+                                className={`w-full bg-transparent border rounded-lg py-2 pl-10 pr-4 text-app-text placeholder:text-app-muted focus:outline-none transition-colors ${
+                                    error.confirmPassword
                                         ? 'border-red-500 bg-red-500/5 focus:border-red-500'
-                                        : 'border-gray-300 focus:border-amber-500'
-                                    }`}
+                                        : 'border-app-border focus:border-amber-500'
+                                }`}
                             />
                         </div>
                     </div>
@@ -233,9 +241,9 @@ export const Register: React.FC = () => {
                     </button>
                 </form>
 
-                <p className="text-center text-sm text-gray-600 mt-6">
+                <p className="text-center text-sm text-app-muted mt-6">
                     ¿Ya tienes una cuenta?{' '}
-                    <Link to="/login" className="text-amber-600 font-medium hover:underline">
+                    <Link to="/login" className="text-amber-500 font-medium hover:underline">
                         Inicia sesión aquí
                     </Link>
                 </p>

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   PALETA BÁSICA
+   1. PALETA BÁSICA LIGHT / DARK (Variables Semánticas)
    ========================================================================== */
 
 :root {
@@ -15,9 +15,20 @@
   --color-app-primary: #3b82f6;
 }
 
+html.dark {
+  --color-app-bg: #0f172a;
+  --color-app-card: #1e293b;
+  --color-app-border: #334155;
+  --color-app-text: #f8fafc;
+  --color-app-muted: #94a3b8;
+  --color-app-button: #1e293b;
+  --color-app-button-hover: #334155;
+  --color-app-primary: #60a5fa;
+}
+
 
 /* ==========================================================================
-   REGISTRO DE TEMA EN TAILWIND CSS v4
+   2. REGISTRO DE TEMA EN TAILWIND CSS v4
    ========================================================================== */
 
 @theme {
@@ -33,7 +44,7 @@
 
 
 /* ==========================================================================
-   ESTILOS BASE
+   3. ESTILOS BASE Y SCROLLBARS
    ========================================================================== */
 
 body {
@@ -43,4 +54,21 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.3);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-app-primary);
 }
