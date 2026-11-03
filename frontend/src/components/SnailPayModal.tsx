@@ -1,9 +1,10 @@
 // src/components/SnailPayModal.tsx
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
 import api from '../api/axios';
 import { type SnailPayData } from '../interfaces/snailPay';
 import { CARD_NUMBER_REGEX, EXPIRATION_DATE_REGEX, CVV_REGEX, AMOUNT_REGEX } from '../utils/formUtils';
-import { CreditCard, DollarSign, ShieldAlert, CheckCircle2, Loader2, X } from 'lucide-react';
+import { CreditCard, DollarSign, ShieldAlert, Loader2, X } from 'lucide-react';
 import { useUserStore } from '../stores/useUserStore';
 
 interface SnailPayModalProps {
@@ -13,7 +14,7 @@ interface SnailPayModalProps {
 
 export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose }) => {
   const { user, updateBalance } = useUserStore();
-  
+
   // Estado unificado del formulario
   const [form, setForm] = useState<SnailPayData>({
     cardNumber: '',
@@ -28,13 +29,8 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
   // Estado para marcar individualmente los inputs con error (bordes rojos)
   const [error, setError] = useState<Record<string, boolean>>({});
 
-  // Mensaje de alerta general y estados de respuesta adaptados al controlador actual
+  // Mensaje de alerta general local para validaciones rápidas de campos vacíos
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [responseMessage, setResponseMessage] = useState<{
-    type: 'success' | 'error';
-    text: string;
-    details?: any
-  } | null>(null);
 
   if (!isOpen) return null;
 
@@ -53,7 +49,6 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setResponseMessage(null);
 
     const { cardNumber, expirationDate, cvv, cardHolderName, amount } = form;
     const newErrors: Record<string, boolean> = {};
@@ -101,10 +96,30 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
       if (!firstErrorMsg) firstErrorMsg = 'Por favor, ingresa un monto válido mayor a 0.';
     }
 
-    // Si hay errores en las validaciones, los mostramos y detenemos el envío
+    // Si hay errores locales en las validaciones, los mostramos
     if (Object.keys(newErrors).length > 0) {
       setError(newErrors);
       setErrorMessage(firstErrorMsg);
+      return;
+    }
+
+    setError({});
+    setErrorMessage(null);
+
+    // 👇 Alerta de confirmación antes de proceder con el pago
+    const confirmResult = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: `Se procesará una recarga de $${amount} MXN a tu cuenta mediante SnailPay.`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#d97706',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Sí, realizar pago',
+      cancelButtonText: 'Cancelar',
+    });
+
+    // Si el usuario cancela, detenemos la ejecución
+    if (!confirmResult.isConfirmed) {
       return;
     }
 
@@ -124,38 +139,56 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
 
       const data = response.data;
 
-      // Capturamos el campo 'mensaje' que viene del controlador
       if (data.status === 'approved') {
-        // Actualizar el saldo global en Zustand (se guarda automáticamente en LocalStorage)
+        // Actualizar el saldo global en Zustand
         updateBalance(data.transaction_amount);
-        setResponseMessage({
-          type: 'success',
-          text: `¡Recarga exitosa! Se han acreditado $${data.transaction_amount} a tu saldo.`,
-          details: data,
+
+        // Alerta de éxito
+        await Swal.fire({
+          icon: 'success',
+          title: '¡Recarga Exitosa!',
+          text: `Se han acreditado $${data.transaction_amount} a tu saldo.`,
+          footer: `<span class="text-xs text-gray-500">Operación: ${data.id} | Auth: ${data.authorization_code}</span>`,
+          confirmButtonColor: '#d97706',
         });
+
+        setForm({
+          cardNumber: '',
+          expirationDate: '',
+          cvv: '',
+          cardHolderName: user?.name || '',
+          amount: '',
+        });
+
+        onClose(); // Cerrar modal tras éxito
       } else {
-        setResponseMessage({
-          type: 'error',
+        // Alerta de rechazo
+        Swal.fire({
+          icon: 'error',
+          title: 'Transacción Rechazada',
           text: data.status_detail || 'La transacción fue rechazada.',
-          details: data,
+          confirmButtonColor: '#d97706',
         });
       }
     } catch (error: any) {
       const errorData = error.response?.data;
 
-      // Si el backend envió un arreglo de errores de express-validator
+      // Si el backend envió errores de express-validator
       if (errorData?.errors && Array.isArray(errorData.errors)) {
-        // Puedes concatenar los mensajes o tomar el primero
-        const messages = errorData.errors.map((err: any) => err.message).join(' | ');
-        setResponseMessage({
-          type: 'error',
-          text: messages || errorData.status_detail || 'Error de validación en los datos.',
+        const messages = errorData.errors.map((err: any) => `• ${err.message}`).join('<br>');
+        Swal.fire({
+          icon: 'warning',
+          title: 'Error de Validación',
+          html: `<div style="text-align: left; font-size: 14px;">${messages}</div>`,
+          confirmButtonColor: '#d97706',
         });
       } else {
-        // Para errores devueltos por el controlador (ej. tarjeta rechazada o error del sistema)
-        setResponseMessage({
-          type: 'error',
+        // Para errores del controlador o del servidor (ej. error 500 del sistema)
+        Swal.fire({
+          icon: 'error',
+          title: 'Error en SnailPay',
           text: errorData?.status_detail || error.message || 'Error al conectar con el servidor de SnailPay.',
+          confirmButtonColor: '#d97706',
         });
       }
     } finally {
@@ -183,38 +216,11 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
           </div>
         </div>
 
-        {/* Alerta general de error de validación */}
+        {/* Alerta general de error de validación local */}
         {errorMessage && (
           <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-2 text-red-600 dark:text-red-400 text-sm">
             <ShieldAlert className="w-5 h-5 shrink-0" />
             <span>{errorMessage}</span>
-          </div>
-        )}
-
-        {/* Alerta de respuesta basada en el controlador */}
-        {responseMessage && (
-          <div className={`mb-4 p-4 rounded-lg flex items-start gap-3 text-sm ${responseMessage.type === 'success'
-              ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
-              : 'bg-red-50 border border-red-200 text-red-700'
-            }`}>
-            {responseMessage.type === 'success' ? (
-              <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5 text-emerald-600" />
-            ) : (
-              <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5 text-red-600" />
-            )}
-            <div>
-              <p className="font-semibold">{responseMessage.text}</p>
-              {responseMessage.details && (
-                <div className="mt-2 text-xs opacity-90 space-y-1">
-                  <p><strong>ID Operación:</strong> {responseMessage.details.id}</p>
-                  <p><strong>Estado:</strong> {responseMessage.details.status}</p>
-                  {responseMessage.details.authorization_code && (
-                    <p><strong>Código Auth:</strong> {responseMessage.details.authorization_code}</p>
-                  )}
-                  <p><strong>Referencia:</strong> {responseMessage.details.reference}</p>
-                </div>
-              )}
-            </div>
           </div>
         )}
 
@@ -230,8 +236,8 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
               onChange={handleChange}
               placeholder="1234123412341234"
               className={`w-full bg-app-bg border rounded-xl py-2 px-3 text-sm focus:outline-none transition-colors ${error.cardNumber
-                ? 'border-red-500 bg-red-500/5 focus:border-red-500'
-                : 'border-app-border focus:border-amber-500'
+                  ? 'border-red-500 bg-red-500/5 focus:border-red-500'
+                  : 'border-app-border focus:border-amber-500'
                 }`}
             />
             <p className="text-[10px] text-app-muted mt-1">
@@ -250,8 +256,8 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
                 value={form.expirationDate}
                 onChange={handleChange}
                 className={`w-full bg-app-bg border rounded-xl py-2 px-3 text-sm focus:outline-none transition-colors ${error.expirationDate
-                  ? 'border-red-500 bg-red-500/5 focus:border-red-500'
-                  : 'border-app-border focus:border-amber-500'
+                    ? 'border-red-500 bg-red-500/5 focus:border-red-500'
+                    : 'border-app-border focus:border-amber-500'
                   }`}
               />
             </div>
@@ -266,8 +272,8 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
                 value={form.cvv}
                 onChange={handleChange}
                 className={`w-full bg-app-bg border rounded-xl py-2 px-3 text-sm focus:outline-none transition-colors ${error.cvv
-                  ? 'border-red-500 bg-red-500/5 focus:border-red-500'
-                  : 'border-app-border focus:border-amber-500'
+                    ? 'border-red-500 bg-red-500/5 focus:border-red-500'
+                    : 'border-app-border focus:border-amber-500'
                   }`}
               />
             </div>
@@ -283,8 +289,8 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
               onChange={handleChange}
               placeholder="Fernando Contreras"
               className={`w-full bg-app-bg border rounded-xl py-2 px-3 text-sm focus:outline-none transition-colors ${error.cardHolderName
-                ? 'border-red-500 bg-red-500/5 focus:border-red-500'
-                : 'border-app-border focus:border-amber-500'
+                  ? 'border-red-500 bg-red-500/5 focus:border-red-500'
+                  : 'border-app-border focus:border-amber-500'
                 }`}
             />
           </div>
@@ -303,8 +309,8 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
                 onChange={handleChange}
                 placeholder="500"
                 className={`w-full bg-app-bg border rounded-xl py-2 pl-9 pr-3 text-sm focus:outline-none transition-colors ${error.amount
-                  ? 'border-red-500 bg-red-500/5 focus:border-red-500'
-                  : 'border-app-border focus:border-amber-500'
+                    ? 'border-red-500 bg-red-500/5 focus:border-red-500'
+                    : 'border-app-border focus:border-amber-500'
                   }`}
               />
             </div>

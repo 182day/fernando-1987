@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, LogIn, ShieldAlert, Loader2 } from 'lucide-react';
+import Swal from 'sweetalert2';
 import { EMAIL_REGEX } from '../utils/formUtils';
 import { type LoginData } from '../interfaces/user';
 import { useUserStore } from '../stores/useUserStore';
@@ -97,9 +98,26 @@ export const Login: React.FC = () => {
   };
 
   // Función para limpiar el storage
-  const handleClearStorage = () => {
-    if (window.confirm('¿Estás seguro de restablecer los datos almacenados localmente?')) {
+  const handleClearStorage = async () => {
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: 'Se eliminarán todos los datos almacenados localmente (snail-racing-user-storage).',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#2563eb',
+      cancelButtonColor: '#ef4444',
+      confirmButtonText: 'Sí, limpiar',
+      cancelButtonText: 'Cancelar',
+    });
+
+    if (result.isConfirmed) {
       localStorage.removeItem('snail-racing-user-storage');
+      await Swal.fire({
+        title: '¡Eliminado!',
+        text: 'Los datos locales han sido borrados con éxito.',
+        icon: 'success',
+        confirmButtonColor: '#2563eb',
+      });
       window.location.reload();
     }
   };
@@ -136,11 +154,10 @@ export const Login: React.FC = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="fernando@example.com"
-                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${
-                  error.email
+                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${error.email
                     ? 'border-red-500 bg-red-500/5 focus:border-red-500'
                     : 'border-gray-300 focus:border-blue-500'
-                }`}
+                  }`}
               />
             </div>
           </div>
@@ -158,11 +175,10 @@ export const Login: React.FC = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${
-                  error.password
+                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${error.password
                     ? 'border-red-500 bg-red-500/5 focus:border-red-500'
                     : 'border-gray-300 focus:border-blue-500'
-                }`}
+                  }`}
               />
             </div>
           </div>
