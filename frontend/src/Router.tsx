@@ -1,17 +1,19 @@
 // src/Router.tsx
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 // Vistas de la aplicación
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
+import { NotFound } from './pages/NotFound';
 
 export function Router() {
   return (
     <BrowserRouter>
       <Routes>
         {/* Rutas Públicas */}
+        <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
@@ -25,7 +27,8 @@ export function Router() {
           }
         />
 
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        {/* Ruta para cualquier URL inexistente */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
