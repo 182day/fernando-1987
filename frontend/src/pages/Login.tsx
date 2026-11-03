@@ -1,11 +1,12 @@
 // src/pages/Login.tsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, LogIn, ShieldAlert, Loader2 } from 'lucide-react';
 import { EMAIL_REGEX } from '../utils/formUtils';
 import { type LoginData } from '../interfaces/user';
 
 export const Login: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<LoginData>({
     email: '',
     password: '',
@@ -49,16 +50,40 @@ export const Login: React.FC = () => {
       firstErrorMsg = 'Por favor, ingresa un correo electrónico válido.';
     }
 
-    // 2. Validar contraseña (vacía o no cumple el formato)
+    // 2. Validar contraseña (vacía)
     if (!password) {
       newErrors.password = true;
       if (!firstErrorMsg) firstErrorMsg = 'Por favor, ingresa tu contraseña.';
     }
 
-    // Si hay algún error, actualizamos los estados y detenemos el envío
+    // Si hay algún error de formato, actualizamos los estados y detenemos el envío
     if (Object.keys(newErrors).length > 0) {
       setError(newErrors);
       setErrorMessage(firstErrorMsg);
+      return;
+    }
+
+    // 3. Verificar credenciales en localStorage ('snail-racing-user-storage')
+    const STORAGE_KEY = 'snail-racing-user-storage';
+    const storedData = localStorage.getItem(STORAGE_KEY);
+    let registeredUsers: any[] = [];
+
+    if (storedData) {
+      try {
+        registeredUsers = JSON.parse(storedData) || [];
+      } catch (err) {
+        registeredUsers = [];
+      }
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const foundUser = registeredUsers.find(
+      (u: any) => u.email === cleanEmail && u.password === password
+    );
+
+    if (!foundUser) {
+      setError({ email: true, password: true });
+      setErrorMessage('Credenciales incorrectas.');
       return;
     }
 
@@ -67,13 +92,15 @@ export const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      console.log('Iniciando sesión con:', { email: email.trim().toLowerCase(), password });
-
       // Simulación de petición de red
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
+      console.log('Inicio de sesión exitoso:', foundUser);
+
+      navigate('/dashboard');
+
     } catch (err) {
-      setErrorMessage('Credenciales incorrectas o error en el servidor.');
+      setErrorMessage('Ocurrió un error en el servidor al iniciar sesión.');
     } finally {
       setLoading(false);
     }

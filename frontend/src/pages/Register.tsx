@@ -1,11 +1,12 @@
 // src/pages/Register.tsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, UserPlus, ShieldAlert, Loader2 } from 'lucide-react';
-import { EMAIL_REGEX, PASSWORD_REGEX } from '../utils/formUtils';
+import { EMAIL_REGEX, PASSWORD_REGEX, STORAGE_KEY } from '../utils/formUtils';
 import { type UserData } from '../interfaces/user';
 
 export const Register: React.FC = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState<UserData>({
         name: '',
         email: '',
@@ -76,10 +77,32 @@ export const Register: React.FC = () => {
             if (!firstErrorMsg) firstErrorMsg = 'Las contraseñas no coinciden.';
         }
 
-        // Si hay errores, actualizamos los estados y detenemos el envío
+        // Si hay errores de formato, actualizamos los estados y detenemos el envío
         if (Object.keys(newErrors).length > 0) {
             setError(newErrors);
             setErrorMessage(firstErrorMsg);
+            return;
+        }
+
+        // 5. Verificar si el correo ya existe en localStorage
+        const storedData = localStorage.getItem(STORAGE_KEY);
+        let registeredUsers: any[] = [];
+
+        if (storedData) {
+            try {
+                registeredUsers = JSON.parse(storedData) || [];
+            } catch (err) {
+                registeredUsers = [];
+            }
+        }
+
+        const emailExists = registeredUsers.some(
+            (u: any) => u.email === email.trim().toLowerCase()
+        );
+
+        if (emailExists) {
+            setError({ email: true });
+            setErrorMessage('Este correo electrónico ya está registrado.');
             return;
         }
 
@@ -88,11 +111,23 @@ export const Register: React.FC = () => {
         setLoading(true);
 
         try {
-            console.log('Register...', { name: name.trim(), email: email.trim().toLowerCase(), password });
-
             // Simulación de petición de red
             await new Promise((resolve) => setTimeout(resolve, 1500));
 
+            const cleanEmail = email.trim().toLowerCase();
+            const newUser = {
+                name: name.trim(),
+                email: cleanEmail,
+                password
+            };
+
+            const updatedUsers = [...registeredUsers, newUser];
+
+            // Guardamos el arreglo de usuarios directamente en LocalStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUsers));
+            console.log('Usuario registrado exitosamente en LocalStorage:', newUser);
+
+            navigate('/login');
         } catch (err) {
             setErrorMessage('Ocurrió un error en el servidor al registrar la cuenta.');
         } finally {
