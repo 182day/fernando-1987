@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   1. PALETA BÁSICA LIGHT / DARK (Variables Semánticas)
+   1. PALETA BÁSICA LIGHT / DARK Y COLORES DE MARCA
    ========================================================================== */
 
 :root {
@@ -13,6 +13,10 @@
   --color-app-button: #f1f5f9;
   --color-app-button-hover: #e2e8f0;
   --color-app-primary: #3b82f6;
+
+  /* Colores de marca requeridos en Layout.tsx */
+  --brand-blue: #0284c7;
+  --brand-magenta: #db2777;
 }
 
 html.dark {
@@ -24,6 +28,10 @@ html.dark {
   --color-app-button: #1e293b;
   --color-app-button-hover: #334155;
   --color-app-primary: #60a5fa;
+
+  /* Tonos ajustados opcionales para modo oscuro */
+  --brand-blue: #38bdf8;
+  --brand-magenta: #ec4899;
 }
 
 
@@ -40,6 +48,10 @@ html.dark {
   --color-app-button: var(--color-app-button);
   --color-app-button-hover: var(--color-app-button-hover);
   --color-app-primary: var(--color-app-primary);
+
+  /* Registro de colores de marca para soportar opacidades (/10, /20, etc.) */
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-magenta: var(--brand-magenta);
 }
 
 

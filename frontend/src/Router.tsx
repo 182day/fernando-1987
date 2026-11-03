@@ -2,6 +2,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
+// Layout y Vistas
+import { Layout } from './layouts/Layout';
+
 // Vistas de la aplicación
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
@@ -17,15 +20,18 @@ export function Router() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Rutas Protegidas (Requieren sesión activa en Zustand) */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+        {/* Layout Principal */}
+        <Route element={<Layout />}>
+          {/* Rutas Protegidas (Requieren sesión activa en Zustand) */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
 
         {/* Ruta para cualquier URL inexistente */}
         <Route path="*" element={<NotFound />} />

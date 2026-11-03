@@ -1,22 +1,14 @@
 // src/pages/Dashboard.tsx
 import React, { useState } from 'react';
 import { useUserStore } from '../stores/useUserStore';
-import { useNavigate } from 'react-router-dom';
 import { formatearPesos } from '../utils/formUtils';
 import { ChartsSection } from '../components/ChartsSection';
 import { SnailPayModal } from '../components/SnailPayModal';
-import { ThemeToggle } from '../components/ThemeToggle';
 
 export const Dashboard: React.FC = () => {
-    const { user, balance, logout } = useUserStore();
-    const navigate = useNavigate();
+    const { user, balance } = useUserStore();
 
     const [isSnailPayOpen, setIsSnailPayOpen] = useState<boolean>(false);
-
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
 
     return (
         <>
@@ -29,8 +21,6 @@ export const Dashboard: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <ThemeToggle />
-
                         <button
                             onClick={() => setIsSnailPayOpen(true)}
                             className="bg-amber-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-amber-600 transition shadow-sm cursor-pointer"
@@ -41,13 +31,6 @@ export const Dashboard: React.FC = () => {
                         <div className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-lg font-bold border border-emerald-500/20">
                             Saldo: {formatearPesos(balance)}
                         </div>
-
-                        <button
-                            onClick={handleLogout}
-                            className="bg-red-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-600 transition shadow-sm cursor-pointer"
-                        >
-                            Cerrar Sesión
-                        </button>
                     </div>
                 </div>
 
