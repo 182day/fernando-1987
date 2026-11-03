@@ -13,6 +13,14 @@ export const Login: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const loginUser = useUserStore((state) => state.login);
+  const isAuthenticated = useUserStore((state) => state.isAuthenticated);
+  
+  // Si ya está autenticado, lo redirigimos al dashboard automáticamente
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     if (location.state?.denied) {

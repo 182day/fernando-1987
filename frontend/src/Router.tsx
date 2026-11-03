@@ -1,6 +1,8 @@
 // src/Router.tsx
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { useUserStore } from './stores/useUserStore';
 
 // Layout y Vistas
 import { Layout } from './layouts/Layout';
@@ -12,12 +14,22 @@ import { Dashboard } from './pages/Dashboard';
 import { RechargesHistory } from './pages/RechargesHistory';
 import { NotFound } from './pages/NotFound';
 
-export function Router() {
+// Componente auxiliar para decidir qué mostrar en la ruta "/"
+export const RootRedirect = () => {
+  const isAuthenticated = useUserStore((state) => state.isAuthenticated);
+
+  // Si está logeado, lo redirige al dashboard; si no, muestra el Login
+  return isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />;
+};
+
+export const Router: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Ruta dinámica */}
+        <Route path="/" element={<RootRedirect />} />
+
         {/* Rutas Públicas */}
-        <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
