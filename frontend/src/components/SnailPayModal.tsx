@@ -1,5 +1,6 @@
 // src/components/SnailPayModal.tsx
 import React, { useState } from 'react';
+import api from '../api/axios';
 import { type SnailPayData } from '../interfaces/snailPay';
 import { CARD_NUMBER_REGEX, EXPIRATION_DATE_REGEX, CVV_REGEX, AMOUNT_REGEX } from '../utils/formUtils';
 import { CreditCard, DollarSign, ShieldAlert, CheckCircle2, Loader2, X } from 'lucide-react';
@@ -24,17 +25,15 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
   // Estado para marcar individualmente los inputs con error (bordes rojos)
   const [error, setError] = useState<Record<string, boolean>>({});
 
-  // Mensaje de alerta general y estados de respuesta
+  // Mensaje de alerta general y estados de respuesta adaptados al controlador actual
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [responseMessage, setResponseMessage] = useState<{ 
     type: 'success' | 'error'; 
     text: string; 
-    details?: any 
   } | null>(null);
 
   if (!isOpen) return null;
 
-  // Manejador handleChange (limpia el error del input al empezar a escribir)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({
@@ -108,31 +107,27 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
     setLoading(true);
 
     try {
-      // Simulación de petición de red
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Petición real al backend
+      const response = await api.post('/snailpay/process', {
+        cardNumber: cardNumber.trim(),
+        expirationDate: expirationDate.trim(),
+        cvv: cvv.trim(),
+        cardHolderName: cardHolderName.trim(),
+        amount: Number(amount),
+      });
 
-      if (cardNumber === '9999999999999999') {
-        setResponseMessage({
-          type: 'error',
-          text: 'La transacción fue rechazada.',
-          details: { status: 'rejected', status_detail: 'Tarjeta simulada con error' }
-        });
-      } else {
-        setResponseMessage({
-          type: 'success',
-          text: '¡Transacción simulada procesada exitosamente!',
-          details: {
-            id: 'tx-mock-001',
-            status: 'approved',
-            authorization_code: 'AUTH-1234',
-            reference: 'REF-TEST'
-          }
-        });
-      }
+      const data = response.data;
+
+      // Capturamos el campo 'mensaje' que viene del controlador
+      setResponseMessage({
+        type: 'success',
+        text: data.mensaje || 'Pago procesado exitosamente',
+      });
     } catch (error: any) {
+      const errorData = error.response?.data;
       setResponseMessage({
         type: 'error',
-        text: 'Error en el procesamiento local.',
+        text: errorData?.mensaje || 'Error en el servidor',
       });
     } finally {
       setLoading(false);
@@ -167,7 +162,7 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
           </div>
         )}
 
-        {/* Alerta de respuesta simulada */}
+        {/* Alerta de respuesta basada en el controlador */}
         {responseMessage && (
           <div className={`mb-4 p-4 rounded-xl flex items-start gap-3 text-sm ${
             responseMessage.type === 'success' 
@@ -181,16 +176,6 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
             )}
             <div>
               <p className="font-semibold">{responseMessage.text}</p>
-              {responseMessage.details && (
-                <div className="mt-2 text-xs opacity-90 space-y-1">
-                  {responseMessage.details.id && <p><strong>ID Operación:</strong> {responseMessage.details.id}</p>}
-                  {responseMessage.details.status && <p><strong>Estado:</strong> {responseMessage.details.status}</p>}
-                  {responseMessage.details.authorization_code && (
-                    <p><strong>Código Auth:</strong> {responseMessage.details.authorization_code}</p>
-                  )}
-                  {responseMessage.details.reference && <p><strong>Referencia:</strong> {responseMessage.details.reference}</p>}
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -213,7 +198,7 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
               }`}
             />
             <p className="text-[10px] text-app-muted mt-1">
-              💡 <strong>Éxito:</strong> 1234123412341234 | <strong>Error:</strong> 9999999999999999
+              💡 <strong>Éxito:</strong> 1234123412341234 (12/26, 543) | <strong>Error del Sistema:</strong> 9999999999999999
             </p>
           </div>
 
@@ -240,7 +225,7 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
                 type="password"
                 name="cvv"
                 disabled={loading}
-                maxLength={3}
+                maxLength={4}
                 placeholder="543"
                 value={form.cvv}
                 onChange={handleChange}

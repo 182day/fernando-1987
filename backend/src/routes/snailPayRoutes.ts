@@ -5,6 +5,6 @@ import { processPayment } from '../controllers/snailPayController';
 const router = Router();
 
 // Endpoint para procesar el pago / recarga con SnailPay
-router.get('/process', processPayment);
+router.post('/process', processPayment);
 
 export default router;
