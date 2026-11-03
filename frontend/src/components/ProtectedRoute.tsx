@@ -1,6 +1,6 @@
 // src/components/ProtectedRoute.tsx
-import React from 'react';
-import { Navigate } from 'react-router-dom';
+import React, { useRef } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useUserStore } from '../stores/useUserStore';
 
 interface ProtectedRouteProps {
@@ -8,14 +8,22 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  // Obtenemos el estado de autenticación desde nuestro store de Zustand
   const isAuthenticated = useUserStore((state) => state.isAuthenticated);
+  const location = useLocation();
 
-  // Si no está autenticado, lo redirigimos a la vista de login
+  const hadSession = useRef(isAuthenticated);
+  if (isAuthenticated) hadSession.current = true;
+
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={hadSession.current ? undefined : { from: location, denied: true }}
+      />
+    );
   }
 
-  // Si está autenticado, renderizamos los componentes hijos (ej. Dashboard)
+  // Si está autenticado, renderiza la ruta protegida (ej. Dashboard)
   return <>{children}</>;
 };

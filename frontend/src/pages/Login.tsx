@@ -1,7 +1,8 @@
 // src/pages/Login.tsx
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, LogIn, ShieldAlert, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import Swal from 'sweetalert2';
 import { EMAIL_REGEX } from '../utils/formUtils';
 import { type LoginData } from '../interfaces/user';
@@ -10,7 +11,18 @@ import { ThemeToggle } from '../components/ThemeToggle';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const loginUser = useUserStore((state) => state.login);
+
+  useEffect(() => {
+    if (location.state?.denied) {
+      toast.error('Acceso denegado. Debes iniciar sesión para continuar.', {
+        id: 'auth-required',
+      });
+      // Limpia el state para que no reaparezca al recargar o volver atrás
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.state]);
 
   const [formData, setFormData] = useState<LoginData>({
     email: '',
@@ -89,6 +101,10 @@ export const Login: React.FC = () => {
         return;
       }
 
+      // Obtenemos el usuario autenticado directamente del store de Zustand
+      const currentUser = useUserStore.getState().user;
+      toast.success(`¡Bienvenido, ${currentUser?.name || 'Usuario'}!`);
+
       console.log('Inicio de sesión exitoso con Zustand');
       navigate('/dashboard');
 
@@ -129,7 +145,7 @@ export const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-app-bg text-app-text flex items-center justify-center p-4 relative transition-colors duration-200">
-      
+
       <ThemeToggle className="absolute top-6 right-6" />
 
       <div className="w-full max-w-md bg-app-card border border-app-border rounded-xl shadow-lg p-8">
@@ -162,11 +178,10 @@ export const Login: React.FC = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="fernando@example.com"
-                className={`w-full bg-transparent border rounded-lg py-2 pl-10 pr-4 text-app-text placeholder:text-app-muted focus:outline-none transition-colors ${
-                  error.email
+                className={`w-full bg-transparent border rounded-lg py-2 pl-10 pr-4 text-app-text placeholder:text-app-muted focus:outline-none transition-colors ${error.email
                     ? 'border-red-500 bg-red-500/5 focus:border-red-500'
                     : 'border-app-border focus:border-app-primary'
-                }`}
+                  }`}
               />
             </div>
           </div>
@@ -184,11 +199,10 @@ export const Login: React.FC = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className={`w-full bg-transparent border rounded-lg py-2 pl-10 pr-4 text-app-text placeholder:text-app-muted focus:outline-none transition-colors ${
-                  error.password
+                className={`w-full bg-transparent border rounded-lg py-2 pl-10 pr-4 text-app-text placeholder:text-app-muted focus:outline-none transition-colors ${error.password
                     ? 'border-red-500 bg-red-500/5 focus:border-red-500'
                     : 'border-app-border focus:border-app-primary'
-                }`}
+                  }`}
               />
             </div>
           </div>
