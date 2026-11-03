@@ -1,7 +1,7 @@
 // src/components/Menu.tsx
 import { NavLink } from 'react-router-dom';
 import {
-    X, ChevronRight, LayoutPanelLeft
+    X, ChevronRight, LayoutPanelLeft, Wallet
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -13,6 +13,7 @@ export const Menu = ({ isOpen, onClose }: SidebarProps) => {
 
     const navItems = [
         { path: '/dashboard', label: 'Dasboard', icon: LayoutPanelLeft },
+        { path: '/recharges', label: 'Recharges', icon: Wallet },
     ];
 
     return (

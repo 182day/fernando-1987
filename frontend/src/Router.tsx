@@ -9,6 +9,7 @@ import { Layout } from './layouts/Layout';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
+import { RechargesHistory } from './pages/RechargesHistory';
 import { NotFound } from './pages/NotFound';
 
 export function Router() {
@@ -28,6 +29,15 @@ export function Router() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/recharges"
+            element={
+              <ProtectedRoute>
+                <RechargesHistory />
               </ProtectedRoute>
             }
           />

@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Menu as Sidebar } from '../components/Menu';
 import { Footer } from '../components/Footer';
-import { Menu, X, LogOut, LayoutDashboard, LayoutPanelLeft } from 'lucide-react';
+import { Menu, X, LogOut, LayoutDashboard, LayoutPanelLeft, Wallet } from 'lucide-react';
 import { useUserStore } from '../stores/useUserStore';
 import { ThemeToggle } from '../components/ThemeToggle';
 
@@ -32,6 +32,13 @@ export const Layout = () => {
             return {
                 title: 'Dashboard',
                 icon: <LayoutPanelLeft className="layout-icons" />,
+            };
+        }
+
+        if (path === '/recharges') {
+            return {
+                title: 'Recharges',
+                icon: <Wallet className="layout-icons" />,
             };
         }
 

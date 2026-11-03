@@ -21,8 +21,9 @@ export const CVV_REGEX = /^\d{3,4}$/;
 export const AMOUNT_REGEX = /^\d+(\.\d{1,2})?$/;
 
 
-// Storage Key
+// Storage Key's
 export const STORAGE_KEY = 'snail-racing-user-storage';
+export const STORAGE_RECHARGES_KEY = 'snail-racing-recharges-storage';
 
 // --- Formatea un número en pesos mexicanos ($ MXN) ---
 const formateadorMXN = new Intl.NumberFormat('es-MX', { 
