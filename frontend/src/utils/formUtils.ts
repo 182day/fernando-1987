@@ -7,6 +7,19 @@ export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Mínimo 6 caracteres, al menos una mayúscula y al menos un carácter especial
 export const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|_<>+\-=]).{6,}$/;
 
+// --- VALIDACIONES DE SMAILPAY ---
+// Número de tarjeta: Exactamente 16 dígitos numéricos
+export const CARD_NUMBER_REGEX = /^\d{16}$/;
+
+// Fecha de vencimiento: Formato MM/YY válido (meses del 01 al 12 y 2 dígitos para el año)
+export const EXPIRATION_DATE_REGEX = /^(0[1-9]|1[0-2])\/\d{2}$/;
+
+// CVV: 3 o 4 dígitos numéricos
+export const CVV_REGEX = /^\d{3,4}$/;
+
+// Monto: Número positivo mayor a 0 (permite hasta 2 decimales)
+export const AMOUNT_REGEX = /^\d+(\.\d{1,2})?$/;
+
 
 // Storage Key
 export const STORAGE_KEY = 'snail-racing-user-storage';
