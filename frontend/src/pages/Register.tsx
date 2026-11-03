@@ -2,11 +2,14 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, UserPlus, ShieldAlert, Loader2 } from 'lucide-react';
-import { EMAIL_REGEX, PASSWORD_REGEX, STORAGE_KEY } from '../utils/formUtils';
+import { EMAIL_REGEX, PASSWORD_REGEX } from '../utils/formUtils';
 import { type UserData } from '../interfaces/user';
+import { useUserStore } from '../stores/useUserStore';
 
 export const Register: React.FC = () => {
     const navigate = useNavigate();
+    const registerUser = useUserStore((state) => state.register);
+
     const [formData, setFormData] = useState<UserData>({
         name: '',
         email: '',
@@ -14,10 +17,10 @@ export const Register: React.FC = () => {
         confirmPassword: '',
     });
     const [loading, setLoading] = useState<boolean>(false);
-    
+
     // Estado para registrar qué campos tienen error individualmente (marcar en rojo)
     const [error, setError] = useState<Record<string, boolean>>({});
-    
+
     // Mensaje de alerta general dinámico
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -37,7 +40,7 @@ export const Register: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         // Desestructuramos el estado dentro de handleSubmit
         const { name, email, password, confirmPassword } = formData;
 
@@ -84,53 +87,29 @@ export const Register: React.FC = () => {
             return;
         }
 
-        // 5. Verificar si el correo ya existe en localStorage
-        const storedData = localStorage.getItem(STORAGE_KEY);
-        let registeredUsers: any[] = [];
-
-        if (storedData) {
-            try {
-                registeredUsers = JSON.parse(storedData) || [];
-            } catch (err) {
-                registeredUsers = [];
-            }
-        }
-
-        const emailExists = registeredUsers.some(
-            (u: any) => u.email === email.trim().toLowerCase()
-        );
-
-        if (emailExists) {
-            setError({ email: true });
-            setErrorMessage('Este correo electrónico ya está registrado.');
-            return;
-        }
-
-        setError({});
-        setErrorMessage(null);
         setLoading(true);
 
         try {
             // Simulación de petición de red
             await new Promise((resolve) => setTimeout(resolve, 1500));
 
-            const cleanEmail = email.trim().toLowerCase();
-            const newUser = {
-                name: name.trim(),
-                email: cleanEmail,
-                password
-            };
+            // 5. Registrar usuario mediante Zustand
+            const success = registerUser(formData);
 
-            const updatedUsers = [...registeredUsers, newUser];
+            if (!success) {
+                setError({ email: true });
+                setErrorMessage('Este correo electrónico ya está registrado.');
+                setLoading(false);
+                return;
+            }
 
-            // Guardamos el arreglo de usuarios directamente en LocalStorage
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUsers));
-            console.log('Usuario registrado exitosamente en LocalStorage:', newUser);
+            setError({});
+            setErrorMessage(null);
+            console.log('Usuario registrado exitosamente mediante Zustand:', { name: name.trim(), email: email.trim().toLowerCase() });
 
             navigate('/login');
         } catch (err) {
             setErrorMessage('Ocurrió un error en el servidor al registrar la cuenta.');
-        } finally {
             setLoading(false);
         }
     };
@@ -167,11 +146,10 @@ export const Register: React.FC = () => {
                                 value={formData.name}
                                 onChange={handleChange}
                                 placeholder="Fernando Contreras"
-                                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${
-                                    error.name 
-                                        ? 'border-red-500 bg-red-500/5 focus:border-red-500' 
+                                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${error.name
+                                        ? 'border-red-500 bg-red-500/5 focus:border-red-500'
                                         : 'border-gray-300 focus:border-amber-500'
-                                }`}
+                                    }`}
                             />
                         </div>
                     </div>
@@ -189,11 +167,10 @@ export const Register: React.FC = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 placeholder="fernando@example.com"
-                                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${
-                                    error.email 
-                                        ? 'border-red-500 bg-red-500/5 focus:border-red-500' 
+                                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${error.email
+                                        ? 'border-red-500 bg-red-500/5 focus:border-red-500'
                                         : 'border-gray-300 focus:border-amber-500'
-                                }`}
+                                    }`}
                             />
                         </div>
                     </div>
@@ -211,11 +188,10 @@ export const Register: React.FC = () => {
                                 value={formData.password}
                                 onChange={handleChange}
                                 placeholder="••••••••"
-                                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${
-                                    error.password 
-                                        ? 'border-red-500 bg-red-500/5 focus:border-red-500' 
+                                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${error.password
+                                        ? 'border-red-500 bg-red-500/5 focus:border-red-500'
                                         : 'border-gray-300 focus:border-amber-500'
-                                }`}
+                                    }`}
                             />
                         </div>
                     </div>
@@ -233,11 +209,10 @@ export const Register: React.FC = () => {
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
                                 placeholder="••••••••"
-                                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${
-                                    error.confirmPassword 
-                                        ? 'border-red-500 bg-red-500/5 focus:border-red-500' 
+                                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${error.confirmPassword
+                                        ? 'border-red-500 bg-red-500/5 focus:border-red-500'
                                         : 'border-gray-300 focus:border-amber-500'
-                                }`}
+                                    }`}
                             />
                         </div>
                     </div>

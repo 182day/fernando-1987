@@ -4,20 +4,23 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, LogIn, ShieldAlert, Loader2 } from 'lucide-react';
 import { EMAIL_REGEX } from '../utils/formUtils';
 import { type LoginData } from '../interfaces/user';
+import { useUserStore } from '../stores/useUserStore';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
+  const loginUser = useUserStore((state) => state.login);
+
   const [formData, setFormData] = useState<LoginData>({
     email: '',
     password: '',
   });
-  
+
   // Estado para registrar qué campos tienen error individualmente (marcar en rojo)
   const [error, setError] = useState<Record<string, boolean>>({});
-  
+
   // Mensaje de alerta general dinámico
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  
+
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,7 +29,7 @@ export const Login: React.FC = () => {
       ...prev,
       [name]: value,
     }));
-    
+
     // Limpiamos el error del input específico y la alerta al empezar a escribir
     if (error[name]) {
       setError((prev) => ({ ...prev, [name]: false }));
@@ -63,30 +66,6 @@ export const Login: React.FC = () => {
       return;
     }
 
-    // 3. Verificar credenciales en localStorage ('snail-racing-user-storage')
-    const STORAGE_KEY = 'snail-racing-user-storage';
-    const storedData = localStorage.getItem(STORAGE_KEY);
-    let registeredUsers: any[] = [];
-
-    if (storedData) {
-      try {
-        registeredUsers = JSON.parse(storedData) || [];
-      } catch (err) {
-        registeredUsers = [];
-      }
-    }
-
-    const cleanEmail = email.trim().toLowerCase();
-    const foundUser = registeredUsers.find(
-      (u: any) => u.email === cleanEmail && u.password === password
-    );
-
-    if (!foundUser) {
-      setError({ email: true, password: true });
-      setErrorMessage('Credenciales incorrectas.');
-      return;
-    }
-
     setError({});
     setErrorMessage(null);
     setLoading(true);
@@ -95,13 +74,24 @@ export const Login: React.FC = () => {
       // Simulación de petición de red
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      console.log('Inicio de sesión exitoso:', foundUser);
+      // 3. Verificar credenciales utilizando Zustand
+      const result = loginUser({
+        email: email.trim().toLowerCase(),
+        password,
+      });
 
+      if (!result.success) {
+        setError({ email: true, password: true });
+        setErrorMessage(result.message || 'Credenciales incorrectas.');
+        setLoading(false);
+        return;
+      }
+
+      console.log('Inicio de sesión exitoso con Zustand');
       navigate('/dashboard');
 
     } catch (err) {
       setErrorMessage('Ocurrió un error en el servidor al iniciar sesión.');
-    } finally {
       setLoading(false);
     }
   };
@@ -138,11 +128,10 @@ export const Login: React.FC = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="fernando@example.com"
-                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${
-                  error.email 
-                    ? 'border-red-500 bg-red-500/5 focus:border-red-500' 
+                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${error.email
+                    ? 'border-red-500 bg-red-500/5 focus:border-red-500'
                     : 'border-gray-300 focus:border-blue-500'
-                }`}
+                  }`}
               />
             </div>
           </div>
@@ -160,11 +149,10 @@ export const Login: React.FC = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${
-                  error.password 
-                    ? 'border-red-500 bg-red-500/5 focus:border-red-500' 
+                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${error.password
+                    ? 'border-red-500 bg-red-500/5 focus:border-red-500'
                     : 'border-gray-300 focus:border-blue-500'
-                }`}
+                  }`}
               />
             </div>
           </div>
