@@ -3,6 +3,7 @@ import React from 'react';
 import { useUserStore } from '../stores/useUserStore';
 import { useNavigate } from 'react-router-dom';
 import { formatearPesos } from '../utils/formUtils';
+import { ChartsSection } from '../components/ChartsSection';
 
 export const Dashboard: React.FC = () => {
     const { user, balance, logout } = useUserStore();
@@ -15,6 +16,7 @@ export const Dashboard: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-app-bg text-app-text p-6 transition-colors duration-200">
+            {/* Cabecera del Dashboard */}
             <div className="flex justify-between items-center bg-app-card border border-app-border p-6 shadow-sm rounded-xl mb-6">
                 <div>
                     <h1 className="text-2xl font-bold font-display">Sistema de Caracoles</h1>
@@ -32,6 +34,9 @@ export const Dashboard: React.FC = () => {
                     Cerrar Sesión
                 </button>
             </div>
+
+            {/* Sección de Gráficas */}
+            <ChartsSection />
         </div>
     );
 };
