@@ -13,6 +13,7 @@ interface UserState {
     isAuthenticated: boolean;
     register: (userData: UserData) => boolean;
     login: (credentials: LoginData) => { success: boolean; message?: string };
+    logout: () => void;
 }
 
 export const useUserStore = create<UserState>()(
@@ -66,7 +67,13 @@ export const useUserStore = create<UserState>()(
                 }
 
                 return { success: false, message: 'Correo o contraseña incorrectos.' };
-            }
+            },
+
+            logout: () =>
+                set({
+                    user: null,
+                    isAuthenticated: false,
+                }),
         }),
         {
             name: STORAGE_KEY, // Clave en LocalStorage
