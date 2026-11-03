@@ -4,7 +4,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, LogIn, ShieldAlert, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Swal from 'sweetalert2';
-import { EMAIL_REGEX } from '../utils/formUtils';
+import { STORAGE_KEY, STORAGE_RECHARGES_KEY, EMAIL_REGEX } from '../utils/formUtils';
 import { type LoginData } from '../interfaces/user';
 import { useUserStore } from '../stores/useUserStore';
 import { ThemeToggle } from '../components/ThemeToggle';
@@ -114,11 +114,11 @@ export const Login: React.FC = () => {
     }
   };
 
-  // Función para limpiar el storage
+  // Función para limpiar el storage (Usuarios y Recargas)
   const handleClearStorage = async () => {
     const result = await Swal.fire({
       title: '¿Estás seguro?',
-      text: 'Se eliminarán todos los datos almacenados localmente (snail-racing-user-storage).',
+      text: 'Se eliminarán todos los datos almacenados localmente (usuarios y recargas).',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#2563eb',
@@ -130,7 +130,9 @@ export const Login: React.FC = () => {
     });
 
     if (result.isConfirmed) {
-      localStorage.removeItem('snail-racing-user-storage');
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STORAGE_RECHARGES_KEY);
+      
       await Swal.fire({
         title: '¡Eliminado!',
         text: 'Los datos locales han sido borrados con éxito.',
