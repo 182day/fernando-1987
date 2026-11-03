@@ -18,6 +18,7 @@ interface UserState {
     register: (userData: UserData) => boolean;
     login: (credentials: LoginData) => { success: boolean; message?: string };
     logout: () => void;
+    updateBalance: (amount: number) => void;
 }
 
 export const useUserStore = create<UserState>()(
@@ -76,6 +77,24 @@ export const useUserStore = create<UserState>()(
                 }
 
                 return { success: false, message: 'Correo o contraseña incorrectos.' };
+            },
+
+            updateBalance: (amount) => {
+                set((state) => {
+                    const newBalance = state.balance + amount;
+                    const updatedUser = state.user ? { ...state.user, balance: newBalance } : null;
+
+                    // Actualizar el saldo también dentro de la lista de usuarios registrados
+                    const updatedRegisteredUsers = state.registeredUsers.map((u) =>
+                        (u.id === state.user?.id && u.email === state.user?.email) ? { ...u, balance: newBalance } : u
+                    );
+
+                    return {
+                        balance: newBalance,
+                        user: updatedUser,
+                        registeredUsers: updatedRegisteredUsers,
+                    };
+                });
             },
 
             logout: () =>

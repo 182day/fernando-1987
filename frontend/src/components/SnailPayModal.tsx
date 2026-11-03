@@ -12,7 +12,7 @@ interface SnailPayModalProps {
 }
 
 export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose }) => {
-  const { user } = useUserStore();
+  const { user, updateBalance } = useUserStore();
   
   // Estado unificado del formulario
   const [form, setForm] = useState<SnailPayData>({
@@ -126,6 +126,8 @@ export const SnailPayModal: React.FC<SnailPayModalProps> = ({ isOpen, onClose })
 
       // Capturamos el campo 'mensaje' que viene del controlador
       if (data.status === 'approved') {
+        // Actualizar el saldo global en Zustand (se guarda automáticamente en LocalStorage)
+        updateBalance(data.transaction_amount);
         setResponseMessage({
           type: 'success',
           text: `¡Recarga exitosa! Se han acreditado $${data.transaction_amount} a tu saldo.`,
