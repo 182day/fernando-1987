@@ -4,12 +4,15 @@ import { persist } from 'zustand/middleware';
 import { type UserData, type LoginData } from '../interfaces/user';
 import { STORAGE_KEY } from '../utils/formUtils';
 
-// Tipo para los usuarios almacenados (omitiendo confirmPassword)
-export interface StoredUser extends Omit<UserData, 'confirmPassword'> { }
+// Interfaz interna para los usuarios guardados (omitiendo confirmPassword y añadiendo balance)
+export interface StoredUser extends Omit<UserData, 'confirmPassword'> {
+  balance?: number;
+}
 
 interface UserState {
     user: StoredUser | null;
     registeredUsers: StoredUser[];
+    balance: number;
     isAuthenticated: boolean;
     register: (userData: UserData) => boolean;
     login: (credentials: LoginData) => { success: boolean; message?: string };
@@ -21,6 +24,7 @@ export const useUserStore = create<UserState>()(
         (set, get) => ({
             user: null,
             registeredUsers: [],
+            balance: 0,
             isAuthenticated: false,
 
             register: (userData) => {
@@ -37,6 +41,7 @@ export const useUserStore = create<UserState>()(
                     name: userData.name.trim(),
                     email: cleanEmail,
                     password: userData.password,
+                    balance: 0,
                 };
 
                 const updatedUsers = [...registeredUsers, newUser];
@@ -45,6 +50,7 @@ export const useUserStore = create<UserState>()(
                     registeredUsers: updatedUsers,
                     user: newUser,
                     isAuthenticated: true,
+                    balance: 0,
                 });
 
                 return true;
@@ -62,6 +68,7 @@ export const useUserStore = create<UserState>()(
                     set({
                         user: found,
                         isAuthenticated: true,
+                        balance: found.balance ?? 0, // Cargamos su balance guardado o 0 por defecto
                     });
                     return { success: true };
                 }
@@ -73,6 +80,7 @@ export const useUserStore = create<UserState>()(
                 set({
                     user: null,
                     isAuthenticated: false,
+                    balance: 0,
                 }),
         }),
         {

@@ -2,9 +2,10 @@
 import React from 'react';
 import { useUserStore } from '../stores/useUserStore';
 import { useNavigate } from 'react-router-dom';
+import { formatearPesos } from '../utils/formUtils';
 
 export const Dashboard: React.FC = () => {
-    const { user, logout } = useUserStore();
+    const { user, balance, logout } = useUserStore();
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -19,7 +20,10 @@ export const Dashboard: React.FC = () => {
                     <h1 className="text-2xl font-bold font-display">Sistema de Caracoles</h1>
                     <p className="text-sm text-app-muted">Bienvenido, <span className="font-semibold text-app-text">{user?.name}</span></p>
                 </div>
-                
+
+                <div className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-lg font-bold border border-emerald-500/20">
+                    Saldo: {formatearPesos(balance)}
+                </div>
 
                 <button
                     onClick={handleLogout}
