@@ -96,6 +96,14 @@ export const Login: React.FC = () => {
     }
   };
 
+  // Función para limpiar el storage
+  const handleClearStorage = () => {
+    if (window.confirm('¿Estás seguro de restablecer los datos almacenados localmente?')) {
+      localStorage.removeItem('snail-racing-user-storage');
+      window.location.reload();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white border border-gray-200 rounded-xl shadow-lg p-8">
@@ -128,10 +136,11 @@ export const Login: React.FC = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="fernando@example.com"
-                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${error.email
+                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${
+                  error.email
                     ? 'border-red-500 bg-red-500/5 focus:border-red-500'
                     : 'border-gray-300 focus:border-blue-500'
-                  }`}
+                }`}
               />
             </div>
           </div>
@@ -149,10 +158,11 @@ export const Login: React.FC = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${error.password
+                className={`w-full border rounded-lg py-2 pl-10 pr-4 text-gray-800 focus:outline-none transition-colors ${
+                  error.password
                     ? 'border-red-500 bg-red-500/5 focus:border-red-500'
                     : 'border-gray-300 focus:border-blue-500'
-                  }`}
+                }`}
               />
             </div>
           </div>
@@ -179,6 +189,17 @@ export const Login: React.FC = () => {
             Regístrate aquí
           </Link>
         </p>
+
+        {/* Botón para limpiar el storage */}
+        <div className="mt-6 pt-4 border-t border-gray-100 text-center">
+          <button
+            type="button"
+            onClick={handleClearStorage}
+            className="text-xs text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+          >
+            Limpiar datos almacenados
+          </button>
+        </div>
       </div>
     </div>
   );
