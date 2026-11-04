@@ -13,7 +13,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
   return (
     <button
       onClick={toggleTheme}
-      className={`p-2.5 rounded-xl bg-app-card border border-app-border hover:bg-app-button-hover text-app-text transition shadow-sm flex items-center gap-2 cursor-pointer ${className}`}
+      className={`px-3.5 py-1.5 rounded-xl bg-app-card border border-app-border hover:bg-app-button-hover text-app-text transition shadow-sm flex items-center gap-2 text-sm font-medium cursor-pointer ${className}`}
       title="Cambiar tema"
     >
       {theme === 'dark' ? (
@@ -21,7 +21,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '' }) => {
       ) : (
         <Moon className="w-5 h-5 text-app-text" />
       )}
-      <span className="text-xs font-medium hidden sm:inline">
+      <span className="hidden sm:inline">
         {theme === 'dark' ? 'Claro' : 'Oscuro'}
       </span>
     </button>

@@ -4,6 +4,7 @@ import { useUserStore } from '../stores/useUserStore';
 import { useRechargeStore } from '../stores/useRechargeStore';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, History, ShieldAlert } from 'lucide-react';
+import { formatearPesos } from '../utils/formUtils';
 
 export const RechargesHistory: React.FC = () => {
   const { user } = useUserStore();
@@ -18,7 +19,7 @@ export const RechargesHistory: React.FC = () => {
         {/* Botón para regresar al Dashboard */}
         <button
           onClick={() => navigate('/dashboard')}
-          className="flex items-center gap-2 mb-6 text-sm font-medium text-app-muted hover:text-app-text transition cursor-pointer"
+          className="hidden sm:flex items-center gap-2 mb-6 text-sm font-medium text-app-muted hover:text-app-text transition cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           Volver al Dashboard
@@ -44,14 +45,14 @@ export const RechargesHistory: React.FC = () => {
           <div className="bg-app-card border border-app-border rounded-xl shadow-sm overflow-hidden">
             <div className="divide-y divide-app-border">
               {userRecharges.map((recharge) => (
-                <div key={recharge.id} className="p-4 flex items-center justify-between gap-4">
-                  <div className="flex items-start gap-3">
+                <div key={recharge.id} className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex flex-row max-[450px]:flex-col items-start max-[450px]:items-center gap-3">
                     {recharge.status === 'approved' ? (
                       <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
                     ) : (
                       <ShieldAlert className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
                     )}
-                    <div>
+                    <div className="max-[450px]:text-center">
                       <p className="font-semibold text-sm">Recarga SnailPay</p>
                       <p className="text-xs text-app-muted">
                         Ref: {recharge.reference} {recharge.authorizationCode && `• Auth: ${recharge.authorizationCode}`}
@@ -62,9 +63,9 @@ export const RechargesHistory: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="text-right">
+                  <div className="flex max-[450px]:flex-col-reverse justify-end max-[450px]:justify-center max-[450px]:w-full items-center gap-2 px-1 sm:px-0 max-[450px]:px-0">
                     <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                      +${recharge.amount.toFixed(2)} MXN
+                      +{formatearPesos(recharge.amount)} MXN
                     </span>
                     <p className="text-[10px] uppercase font-semibold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full mt-1 inline-block">
                       {recharge.status}

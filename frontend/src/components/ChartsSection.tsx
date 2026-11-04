@@ -5,7 +5,7 @@ import { PieChart as PieChartIcon, Trophy } from 'lucide-react';
 import { DONUT_DATA, DONUT_COLORS, BAR_DATA } from '../data/charts';
 
 export const ChartsSection: React.FC = () => {
-    // Mapeamos los colores directamente a los datos para evitar usar <Cell />
+    // Mapeamos los colores
     const donutDataWithColors = DONUT_DATA.map((entry, index) => ({
         ...entry,
         fill: DONUT_COLORS[index % DONUT_COLORS.length],

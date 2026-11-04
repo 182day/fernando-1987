@@ -77,7 +77,17 @@ export const Footer: React.FC = () => {
                 </div>
 
                 <div className="w-full flex flex-col max-[1085px]:flex-col min-[1086px]:flex-row items-center justify-between gap-2 text-xs text-app-muted mt-2 text-center">
-                    <span>Desarrollado por Fernando Contreras de la Garza</span>
+                    <span>
+                        Desarrollado por{' '}
+                        <a
+                            href="https://fer.agc.com.mx"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-app-text hover:text-brand-blue underline transition"
+                        >
+                            Fernando Contreras de la Garza
+                        </a>
+                    </span>
                     <span>© {new Date().getFullYear()} Sistema de Caracoles. Todos los derechos reservados.</span>
                 </div>
             </div>
