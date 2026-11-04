@@ -52,7 +52,7 @@ export const useUserStore = create<UserState>()(
                 set({
                     registeredUsers: updatedUsers,
                     user: newUser,
-                    isAuthenticated: true,
+                    isAuthenticated: false,
                     balance: 0,
                 });
 
